@@ -2,423 +2,148 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>우리 가족 스마트 플래너 V1.0</title>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-
-    <style>
-        :root {
-            --primary: #2F80ED;
-            --primary-light: #EFF6FF;
-            --bg: #F8FAFC;
-            --border: #E2E8F0;
-            --text: #0F172A;
-            --sub: #64748B;
-            --danger: #EF4444;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: #F1F5F9;
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 600px;
-            background: #FFFFFF;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        header {
-            padding: 16px 20px;
-            background: #FFFFFF;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .app-title {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .sync-status {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 8px;
-            border-radius: 12px;
-            background: #DCFCE7;
-            color: #166534;
-        }
-
-        .member-tabs {
-            display: flex;
-            gap: 6px;
-            overflow-x: auto;
-            padding-bottom: 2px;
-        }
-
-        .member-tab {
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            border: 1px solid var(--border);
-            background: var(--bg);
-            color: var(--sub);
-            cursor: pointer;
-            white-space: nowrap;
-            transition: 0.15s;
-        }
-
-        .member-tab.active {
-            background: var(--primary);
-            color: #FFFFFF;
-            border-color: var(--primary);
-        }
-
-        .date-banner {
-            padding: 14px 20px;
-            background: var(--primary-light);
-            color: var(--primary);
-            font-size: 14px;
-            font-weight: 800;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .input-section {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            gap: 8px;
-            background: #FFFFFF;
-        }
-
-        select, input[type="text"] {
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            font-size: 14px;
-            outline: none;
-            background: var(--bg);
-        }
-
-        select:focus, input[type="text"]:focus {
-            border-color: var(--primary);
-            background: #FFFFFF;
-        }
-
-        select {
-            font-weight: 700;
-            color: var(--text);
-            flex-shrink: 0;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .add-btn {
-            padding: 0 16px;
-            background: var(--primary);
-            color: #FFFFFF;
-            border: none;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-
-        .add-btn:active {
-            opacity: 0.85;
-        }
-
-        .todo-list {
-            flex: 1;
-            padding: 16px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .todo-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 14px;
-            background: #FFFFFF;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            transition: 0.15s;
-        }
-
-        .todo-item.done {
-            background: var(--bg);
-            opacity: 0.7;
-        }
-
-        .todo-checkbox {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: var(--primary);
-        }
-
-        .owner-badge {
-            font-size: 11px;
-            font-weight: 800;
-            padding: 3px 8px;
-            border-radius: 6px;
-            background: var(--primary-light);
-            color: var(--primary);
-            flex-shrink: 0;
-        }
-
-        .todo-text {
-            flex: 1;
-            font-size: 14px;
-            font-weight: 600;
-            word-break: break-all;
-        }
-
-        .todo-item.done .todo-text {
-            text-decoration: line-through;
-            color: var(--sub);
-        }
-
-        .del-btn {
-            background: none;
-            border: none;
-            color: var(--sub);
-            font-size: 16px;
-            cursor: pointer;
-            padding: 4px;
-        }
-
-        .del-btn:hover {
-            color: var(--danger);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--sub);
-            font-size: 14px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리 가족 스마트 플래너</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDK (Compatibility Mode) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
-<body>
+<body class="bg-gray-50 min-h-screen font-sans">
 
-<div class="app-container">
-    <header>
-        <div class="header-top">
-            <div class="app-title">🏡 우리 가족 플래너</div>
-            <div class="sync-status" id="syncStatus">연결 중...</div>
+    <div class="max-w-md mx-auto p-4 bg-white min-h-screen shadow-sm flex flex-col justify-between">
+        <div>
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6 pt-2">
+                <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    🏠 우리 가족 플래너
+                </h1>
+                <span id="sync-status" class="text-xs px-2.5 py-1 rounded-full font-medium bg-amber-100 text-amber-700">
+                    연결 중...
+                </span>
+            </div>
+
+            <!-- Date & Progress -->
+            <div class="flex justify-between items-center mb-4 bg-blue-50 p-3 rounded-xl">
+                <span id="current-date" class="text-sm font-semibold text-blue-900">날짜 불러오는 중...</span>
+                <span id="progress-text" class="text-xs font-bold text-blue-700">0 / 0 완료</span>
+            </div>
+
+            <!-- Input Area -->
+            <div class="flex gap-2 mb-6">
+                <select id="todo-member" class="border border-gray-300 rounded-lg px-2 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="아빠">아빠</option>
+                    <option value="엄마">엄마</option>
+                    <option value="첫째">첫째</option>
+                    <option value="둘째">둘째</option>
+                    <option value="공통">공통</option>
+                </select>
+                <input type="text" id="todo-input" placeholder="할 일을 입력하세요..." class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" onkeypress="if(event.key === 'Enter') addTodo()">
+                <button onclick="addTodo()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">추가</button>
+            </div>
+
+            <!-- Member Filter Tabs -->
+            <div class="flex gap-1 mb-4 border-b border-gray-200 pb-2 overflow-x-auto">
+                <button onclick="filterMember('전체')" class="filter-btn px-3 py-1 text-xs rounded-full bg-blue-600 text-white font-medium transition" data-member="전체">전체</button>
+                <button onclick="filterMember('아빠')" class="filter-btn px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-600 font-medium transition" data-member="아빠">아빠</button>
+                <button onclick="filterMember('엄마')" class="filter-btn px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-600 font-medium transition" data-member="엄마">엄마</button>
+                <button onclick="filterMember('첫째')" class="filter-btn px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-600 font-medium transition" data-member="첫째">첫째</button>
+                <button onclick="filterMember('둘째')" class="filter-btn px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-600 font-medium transition" data-member="둘째">둘째</button>
+                <button onclick="filterMember('공통')" class="filter-btn px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-600 font-medium transition" data-member="공통">공통</button>
+            </div>
+
+            <!-- Todo List Container -->
+            <div id="todo-list" class="space-y-2">
+                <div class="text-center py-10 text-gray-400 text-sm">등록된 할 일이 없습니다.</div>
+            </div>
         </div>
-        <div class="member-tabs" id="memberTabs"></div>
-    </header>
 
-    <div class="date-banner">
-        <span id="todayDateDisplay">날짜 불러오는 중...</span>
-        <span id="taskCounter">0 / 0 완료</span>
+        <!-- Footer -->
+        <div class="text-center text-xs text-gray-400 py-4">
+            Family Smart Planner V1.0
+        </div>
     </div>
 
-    <div class="input-section">
-        <select id="ownerSelect"></select>
-        <input type="text" id="todoInput" placeholder="할 일을 입력하세요..." onkeypress="if(event.key==='Enter') addTodo()">
-        <button class="add-btn" onclick="addTodo()">추가</button>
-    </div>
+    <script>
+        // 🔴 아래 firebaseConfig 안의 내용을 본인의 설정값으로 정확히 채워주세요!
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID"
+        };
 
-    <div class="todo-list" id="todoList">
-        <div class="empty-state">등록된 할 일이 없습니다.</div>
-    </div>
-</div>
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-<script>
-    // 👇 아래 firebaseConfig 안의 내용을 본인의 파이어베이스 설정값으로 채워주세요!
-    const firebaseConfig = {
-        // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+        // App State
+        let currentFilter = '전체';
+        let allTodos = {};
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDhjAY1MVsJB_BcWV5dxYeX_GGcshv6nOI",
-  authDomain: "experience-for-you-376b1.firebaseapp.com",
-  databaseURL: "https://experience-for-you-376b1-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "experience-for-you-376b1",
-  storageBucket: "experience-for-you-376b1.firebasestorage.app",
-  messagingSenderId: "512936460767",
-  appId: "1:512936460767:web:e274cff13dc3d0cd6dc46a",
-  measurementId: "G-EB8ENP538B"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    const members = ['전체', '아빠', '엄마', '첫째', '둘째'];
-    let currentFilter = '전체';
-    let todos = {};
-
-    function initApp() {
-        renderDate();
-        renderMemberUI();
-        renderTodos();
-        connectFirebase();
-    }
-
-    function renderDate() {
-        const now = new Date();
+        // Date Display
+        const dateEl = document.getElementById('current-date');
+        const today = new Date();
         const days = ['일', '월', '화', '수', '목', '금', '토'];
-        const dateStr = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일 (${days[now.getDay()]})`;
-        document.getElementById('todayDateDisplay').innerText = dateStr;
-    }
+        dateEl.innerText = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, '0')}.${String(today.getDate()).padStart(2, '0')} (${days[today.getDay()]})`;
 
-    function renderMemberUI() {
-        const tabsEl = document.getElementById('memberTabs');
-        tabsEl.innerHTML = members.map(m => `
-            <button class="member-tab ${currentFilter === m ? 'active' : ''}" onclick="setFilter('${m}')">
-                ${m}
-            </button>
-        `).join('');
-
-        const selectEl = document.getElementById('ownerSelect');
-        const actualMembers = members.filter(m => m !== '전체');
-        selectEl.innerHTML = actualMembers.map(m => `
-            <option value="${m}" ${currentFilter === m ? 'selected' : ''}>${m}</option>
-        `).join('');
-    }
-
-    function setFilter(member) {
-        currentFilter = member;
-        renderMemberUI();
-        renderTodos();
-    }
-
-    function connectFirebase() {
-        const statusEl = document.getElementById('syncStatus');
+        // Realtime Sync Status & Data Fetching
+        const statusEl = document.getElementById('sync-status');
+        const todosRef = db.ref('todos');
 
         db.ref('.info/connected').on('value', (snap) => {
             if (snap.val() === true) {
-                statusEl.innerText = '● 실시간 동기화 중';
-                statusEl.style.background = '#DCFCE7';
-                statusEl.style.color = '#166534';
+                statusEl.innerText = "● 실시간 동기화 중";
+                statusEl.className = "text-xs px-2.5 py-1 rounded-full font-medium bg-emerald-100 text-emerald-700";
             } else {
-                statusEl.innerText = '○ 오프라인';
-                statusEl.style.background = '#FEE2E2';
-                statusEl.style.color = '#991B1B';
+                statusEl.innerText = "○ 오프라인";
+                statusEl.className = "text-xs px-2.5 py-1 rounded-full font-medium bg-rose-100 text-rose-700";
             }
         });
 
-        db.ref('v1_todos').on('value', (snapshot) => {
-            todos = snapshot.val() || {};
+        todosRef.on('value', (snapshot) => {
+            allTodos = snapshot.val() || {};
             renderTodos();
         });
-    }
 
-    function addTodo() {
-        const inputEl = document.getElementById('todoInput');
-        const ownerEl = document.getElementById('ownerSelect');
-        const text = inputEl.value.trim();
+        // Add Todo
+        function addTodo() {
+            const input = document.getElementById('todo-input');
+            const memberSelect = document.getElementById('todo-member');
+            const text = input.value.trim();
+            
+            if (!text) return;
 
-        if (!text) return;
+            const newTodoRef = todosRef.push();
+            newTodoRef.set({
+                text: text,
+                member: memberSelect.value,
+                completed: false,
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            });
 
-        const newRef = db.ref('v1_todos').push();
-        newRef.set({
-            owner: ownerEl.value,
-            text: text,
-            done: false,
-            createdAt: Date.now()
-        });
-
-        inputEl.value = '';
-        inputEl.focus();
-    }
-
-    function toggleTodo(id, currentStatus) {
-        db.ref(`v1_todos/${id}/done`).set(!currentStatus);
-    }
-
-    function deleteTodo(id) {
-        if (confirm('이 할 일을 삭제할까요?')) {
-            db.ref(`v1_todos/${id}`).remove();
-        }
-    }
-
-    function renderTodos() {
-        const listEl = document.getElementById('todoList');
-        const entries = Object.entries(todos);
-
-        const filtered = entries.filter(([id, item]) => {
-            if (currentFilter === '전체') return true;
-            return item.owner === currentFilter;
-        });
-
-        const doneCount = filtered.filter(([_, item]) => item.done).length;
-        document.getElementById('taskCounter').innerText = `${doneCount} / ${filtered.length} 완료`;
-
-        if (filtered.length === 0) {
-            listEl.innerHTML = `<div class="empty-state">등록된 할 일이 없습니다.</div>`;
-            return;
+            input.value = '';
         }
 
-        listEl.innerHTML = filtered.map(([id, item]) => `
-            <div class="todo-item ${item.done ? 'done' : ''}">
-                <input type="checkbox" class="todo-checkbox" ${item.done ? 'checked' : ''} onchange="toggleTodo('${id}', ${item.done})">
-                <span class="owner-badge">${item.owner}</span>
-                <span class="todo-text">${escapeHtml(item.text)}</span>
-                <button class="del-btn" onclick="deleteTodo('${id}')" title="삭제">✕</button>
-            </div>
-        `).join('');
-    }
+        // Toggle Todo Status
+        function toggleTodo(id) {
+            const todo = allTodos[id];
+            if (todo) {
+                todosRef.child(id).update({ completed: !todo.completed });
+            }
+        }
 
-    function escapeHtml(str) {
-        return str.replace(/[&<>"']/g, function(m) {
-            return { '&': '&', '<': '<', '>': '>', '"': '"', "'": ''' }[m];
-        });
-    }
+        // Delete Todo
+        function deleteTodo(id) {
+            todosRef.child(id).remove();
+        }
 
-    initApp();
-</script>
-</body>
-</html>
+        // Filter Member
+        function filterMember(member) {
+            currentFilter = member;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.member === member) {
+                    btn.className = "filter-btn px-3 py-1 text-xs rounded-full bg-blue-600 text-white font-medium transition";
+                } else {
+                    btn.className = "filter-btn px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-600 font-medium transition";
